@@ -1,6 +1,6 @@
 "use client";
 import { useState } from "react";
-import Chessboard from "../components/chessboard";
+import Chessboard from "../components/Chessboard";
 
 export default function Home() {
   const [player, setPlayer] = useState("White");

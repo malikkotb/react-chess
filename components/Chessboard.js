@@ -1,8 +1,9 @@
-import React from "react";
-import Tile from "./tile";
+import Tile from "./Tile";
 
 export default function Chessboard() {
   const board = [];
+
+  const letters = ['A','B','C','D','E','F','G','H']
 
   // two loops to create the board
   for (let rowIndex = 0; rowIndex < 8; rowIndex++) {
@@ -11,7 +12,7 @@ export default function Chessboard() {
         <Tile
           rowIndex={rowIndex}
           colIndex={colIndex}
-          key={rowIndex + colIndex}
+          key={`${colIndex}-${rowIndex}`}
         />
       );
     }
