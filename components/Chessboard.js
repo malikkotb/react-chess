@@ -18,6 +18,7 @@ export default function Chessboard() {
     }
   }
 
+
   return (
     <div className="grid grid-cols-8 gap-0 w-[600px] h-[600px] bg-transparent">
       {board}

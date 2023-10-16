@@ -1,9 +1,10 @@
-"use client"
+"use client";
+
+import { useState, useEffect } from "react";
+
 export default function Tile({ rowIndex, colIndex }) {
-  const helper = (rowIndex, colIndex) => {
-    console.log("Row index = ", rowIndex);
-    console.log("Column index = ", colIndex);
-  };
+  const [pieceImage, setPieceImage] = useState("");
+  const [selectedPiece, setSelectedPiece] = useState(null);
 
   const piecePositions = [
     ["", "", "", "", "", "", "", ""],
@@ -13,36 +14,54 @@ export default function Tile({ rowIndex, colIndex }) {
     ["", "", "", "", "", "", "", ""],
     ["", "", "", "", "", "", "", ""],
     ["q", "", "", "", "", "", "", "n"], // white pieces (lowercase)
-    ["", "", "", "", "", "", "", ""], 
+    ["", "", "", "", "", "", "", ""],
   ];
 
-  const getPieceImage = () => {
+  useEffect(() => {
     const piece = piecePositions[rowIndex][colIndex]; // Get the piece for this cell
-    console.log(piece);
     switch (piece) {
       case "Q":
-        return "/assets/queen_dark.svg";
+        setPieceImage("/assets/queen_dark.svg");
+        break;
       case "N":
-        return "/assets/knight_dark.svg";
+        setPieceImage("/assets/knight_dark.svg");
+        break;
       case "q":
-        return "/assets/queen_light.svg";
+        setPieceImage("/assets/queen_light.svg");
+        break;
       case "n":
-        return "/assets/knight_light.svg";
+        setPieceImage("/assets/knight_light.svg");
+        break;
       default:
-        return null
+        setPieceImage(null);
+        break;
     }
-  };
+  }, [piecePositions, rowIndex, colIndex]);
+
+  const handleTileClick = (rowIndex, colIndex) => {
+    if (!selectedPiece) {
+        // Select the piece:
+        console.log(`Selecting : ${rowIndex},${colIndex}`);
+        setSelectedPiece({rowIndex, colIndex})
+        console.log(selectedPiece);
+    } else if (selectedPiece) {
+        // piece is selected
+        console.log(selectedPiece);
+        console.log(`A Piece is selected at: ${rowIndex},${colIndex}`);
+    }
+  }
+
 
   return (
     <div
       className={`w-[75px] h-[75px] ${
         (rowIndex + colIndex) % 2 === 0 ? "bg-[#ebecd0]" : "bg-[#779556]"
       } grid place-content-center`}
-    >
-      {getPieceImage() !== null && <img
-        src={getPieceImage()}
-        className="h-12 w-12"
-      ></img>}
+      onClick={() => handleTileClick(rowIndex, colIndex)}
+      >
+      {pieceImage && (
+        <img src={pieceImage} className="h-12 w-12" alt="piece_image"></img>
+      )}
     </div>
   );
 }
