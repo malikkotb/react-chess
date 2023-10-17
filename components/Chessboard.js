@@ -1,9 +1,28 @@
+"use client"
+import { useState } from "react";
 import Tile from "./Tile";
 
 export default function Chessboard() {
   const board = [];
 
   const letters = ['A','B','C','D','E','F','G','H']
+
+  const [piecePositions, setPiecePositions] = useState([
+    // Initial piece positions
+    ["", "", "", "", "", "", "", ""],
+    ["N", "", "", "", "", "", "", "Q"],
+    ["", "", "", "", "", "", "", ""],
+    ["", "", "", "", "", "", "", ""],
+    ["", "", "", "", "", "", "", ""],
+    ["", "", "", "", "", "", "", ""],
+    ["q", "", "", "", "", "", "", "n"],
+    ["", "", "", "", "", "", "", ""],
+  ]);
+
+  const updatePiecePositions = (newPiecePositions) => {
+    // Update the piece positions in the state
+    setPiecePositions(newPiecePositions);
+  };
 
   // two loops to create the board
   for (let rowIndex = 0; rowIndex < 8; rowIndex++) {
@@ -13,6 +32,8 @@ export default function Chessboard() {
           rowIndex={rowIndex}
           colIndex={colIndex}
           key={`${colIndex}-${rowIndex}`}
+          updatePiecePositions={updatePiecePositions}
+          piecePositions={piecePositions}
         />
       );
     }
