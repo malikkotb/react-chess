@@ -6,7 +6,7 @@ export default function Chessboard() {
   const board = [];
 
   const letters = ['A','B','C','D','E','F','G','H']
-
+  const [selectedPiece, setSelectedPiece] = useState(null);
   const [piecePositions, setPiecePositions] = useState([
     // Initial piece positions
     ["", "", "", "", "", "", "", ""],
@@ -24,6 +24,10 @@ export default function Chessboard() {
     setPiecePositions(newPiecePositions);
   };
 
+  const updateSelectedPiece = (newSelectedPiece) => {
+    setSelectedPiece(newSelectedPiece);
+  }
+
   // two loops to create the board
   for (let rowIndex = 0; rowIndex < 8; rowIndex++) {
     for (let colIndex = 0; colIndex < 8; colIndex++) {
@@ -34,6 +38,8 @@ export default function Chessboard() {
           key={`${colIndex}-${rowIndex}`}
           updatePiecePositions={updatePiecePositions}
           piecePositions={piecePositions}
+          selectedPiece={selectedPiece}
+          updateSelectedPiece={updateSelectedPiece}
         />
       );
     }

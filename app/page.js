@@ -11,7 +11,7 @@ export default function Home() {
       <div className="flex items-center justify-center h-screen">
         <div>
           <Chessboard />
-          <div className="text-white text-2xl flex justify-center p-4">{player}'s Turn</div>
+          <div className="text-white text-2xl flex justify-center p-4">{player} Turn</div>
         </div>
       </div>
     </main>
