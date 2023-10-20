@@ -7,7 +7,8 @@ export default function Tile({
   updatePiecePositions,
   piecePositions,
   updateSelectedPiece,
-  selectedPiece
+  selectedPiece,
+  isPossibleMove,
 }) {
   const [pieceImage, setPieceImage] = useState("");
 
@@ -32,19 +33,55 @@ export default function Tile({
     }
   }, [piecePositions, rowIndex, colIndex]);
 
+  function calculateKnightMoves(row, col) {
+    const possibleMoves = [];
+    const moveOffsets = [
+      [-2, 1],
+      [-1, 2],
+      [1, 2],
+      [2, 1],
+      [2, -1],
+      [1, -2],
+      [-1, -2],
+      [-2, -1],
+    ];
+
+    for (const [offsetRow, offsetCol] of moveOffsets) {
+      const newRow = row + offsetRow;
+      const newCol = col + offsetCol;
+
+      if (newRow >= 0 && newRow < 8 && newCol >= 0 && newCol < 8) {
+        // check if destination empty / contains an opponent's piece
+        const destinationPiece = piecePositions[newRow][newCol];
+        if (
+          destinationPiece === "" ||
+          (destinationPiece !== "" &&
+            destinationPiece.toUpperCase() !==
+              piecePositions[row][col].toUpperCase())
+        ) {
+          possibleMoves.push([newRow, newCol]);
+        }
+      }
+    }
+    console.log(possibleMoves);
+    return possibleMoves;
+  }
+
   const handleTileClick = () => {
     const piece = piecePositions[rowIndex][colIndex];
     if (piece !== "" && !selectedPiece) {
       const player = piece === piece.toUpperCase() ? "Black" : "White"; // TODO: to check if it is that players turn
+      calculateKnightMoves(rowIndex, colIndex); 
+      // TODO: lift state of calculated moves up to chessboard component
+      // to highlight tiles
       updateSelectedPiece({ player, piece, rowIndex, colIndex });
-    }
-  };
+      
+    } else if (selectedPiece) {
+      console.log("selectedPiece: ", selectedPiece);
+      console.log("moved to: -> ", rowIndex, colIndex);
 
-  const handleMovePiece = (newRowIndex, newColIndex) => {
-    console.log("handleMovePiece()");
-    console.log("selectedPiece: ", selectedPiece);
-    if (selectedPiece) {
-      // If a piece is selected and the clicked tile is not empty, move the piece
+      // calculate possible moves for that piece
+
       const updatedPiecePositions = [...piecePositions];
       updatedPiecePositions[rowIndex][colIndex] = selectedPiece.piece;
       const prevRowIndex = selectedPiece.rowIndex;
@@ -69,13 +106,7 @@ export default function Tile({
       }
       grid place-content-center`}
       onClick={() => {
-        if (piecePositions[rowIndex][colIndex] !== "") {
-          handleTileClick();
-        }
-        // if (piecePositions[rowIndex][colIndex] === "")
-        else if (selectedPiece) {
-          handleMovePiece(rowIndex, colIndex);
-        }
+        handleTileClick();
       }}
     >
       {pieceImage && (

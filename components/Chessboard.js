@@ -28,6 +28,18 @@ export default function Chessboard() {
     setSelectedPiece(newSelectedPiece);
   }
 
+
+  const isTilePossibleMove = (row, col) => {
+    if (selectedPiece === "N" /* Knight */) {
+      const possibleKnightMoves = calculateKnightMoves(selectedPiece.rowIndex, selectedPiece.colIndex);
+      console.log(possibleKnightMoves);
+      return possibleKnightMoves.some(([moveRow, moveCol]) => moveRow === row && moveCol === col);
+    }
+    // Add more conditions for other piece types here
+    return false;
+  };
+
+
   // two loops to create the board
   for (let rowIndex = 0; rowIndex < 8; rowIndex++) {
     for (let colIndex = 0; colIndex < 8; colIndex++) {
@@ -40,10 +52,12 @@ export default function Chessboard() {
           piecePositions={piecePositions}
           selectedPiece={selectedPiece}
           updateSelectedPiece={updateSelectedPiece}
+          isPossibleMove={isTilePossibleMove(rowIndex, colIndex)}
         />
       );
     }
   }
+
 
 
   return (
