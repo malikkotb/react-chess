@@ -4,9 +4,8 @@ import Tile from "./Tile";
 
 export default function Chessboard() {
   const board = [];
-
-  const letters = ['A','B','C','D','E','F','G','H']
   const [selectedPiece, setSelectedPiece] = useState(null);
+  const [possibleMoves, setPossibleMoves] = useState([]);
   const [piecePositions, setPiecePositions] = useState([
     // Initial piece positions
     ["", "", "", "", "", "", "", ""],
@@ -18,6 +17,9 @@ export default function Chessboard() {
     ["q", "", "", "", "", "", "", "n"],
     ["", "", "", "", "", "", "", ""],
   ]);
+  const updatePossibleMoves = (newPossibleMoves) => {
+    setPossibleMoves(newPossibleMoves);
+  }
 
   const updatePiecePositions = (newPiecePositions) => {
     // Update the piece positions in the state
@@ -28,15 +30,8 @@ export default function Chessboard() {
     setSelectedPiece(newSelectedPiece);
   }
 
-
   const isTilePossibleMove = (row, col) => {
-    if (selectedPiece === "N" /* Knight */) {
-      const possibleKnightMoves = calculateKnightMoves(selectedPiece.rowIndex, selectedPiece.colIndex);
-      console.log(possibleKnightMoves);
-      return possibleKnightMoves.some(([moveRow, moveCol]) => moveRow === row && moveCol === col);
-    }
-    // Add more conditions for other piece types here
-    return false;
+    return possibleMoves.some(([moveRow, moveCol]) => moveRow === row && moveCol === col);
   };
 
 
@@ -52,6 +47,8 @@ export default function Chessboard() {
           piecePositions={piecePositions}
           selectedPiece={selectedPiece}
           updateSelectedPiece={updateSelectedPiece}
+          possibleMoves={possibleMoves}
+          updatePossibleMoves={updatePossibleMoves}
           isPossibleMove={isTilePossibleMove(rowIndex, colIndex)}
         />
       );

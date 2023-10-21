@@ -9,6 +9,8 @@ export default function Tile({
   updateSelectedPiece,
   selectedPiece,
   isPossibleMove,
+  possibleMoves,
+  updatePossibleMoves
 }) {
   const [pieceImage, setPieceImage] = useState("");
 
@@ -34,7 +36,7 @@ export default function Tile({
   }, [piecePositions, rowIndex, colIndex]);
 
   function calculateKnightMoves(row, col) {
-    const possibleMoves = [];
+    const possibleKnightMoves = [];
     const moveOffsets = [
       [-2, 1],
       [-1, 2],
@@ -45,7 +47,6 @@ export default function Tile({
       [-1, -2],
       [-2, -1],
     ];
-
     for (const [offsetRow, offsetCol] of moveOffsets) {
       const newRow = row + offsetRow;
       const newCol = col + offsetCol;
@@ -58,37 +59,83 @@ export default function Tile({
           (destinationPiece !== "" &&
             destinationPiece.toUpperCase() !==
               piecePositions[row][col].toUpperCase())
+              // TODO: change this to also check for lowercase
         ) {
-          possibleMoves.push([newRow, newCol]);
+          possibleKnightMoves.push([newRow, newCol]);
         }
       }
     }
-    console.log(possibleMoves);
-    return possibleMoves;
+    return possibleKnightMoves;
   }
+
+  function calculateQueenMoves(row, col) {
+    const possibleQueenMoves = [];
+
+    // Define move directions (horizontal, vertical, and diagonal)
+    const moveDirections = [
+      [-1, 0], [1, 0], [0, -1], [0, 1], // Vertical and horizontal
+      [-1, -1], [-1, 1], [1, -1], [1, 1], // Diagonal
+    ];
+
+    for (const [offsetRow, offsetCol] of moveDirections) {
+      let newRow = row + offsetRow;
+      let newCol = col + offsetCol;
+
+      while (newRow >= 0 && newRow < 8 && newCol >= 0 && newCol < 8) {
+        // Check if the destination is empty or contains an opponent's piece
+        const destinationPiece = piecePositions[newRow][newCol];
+        if (destinationPiece === "") {
+          possibleQueenMoves.push([newRow, newCol]);
+        } else if (destinationPiece.toUpperCase() !== piecePositions[row][col].toUpperCase()) {
+          possibleQueenMoves.push([newRow, newCol]);
+          break; // Stop if it's an opponent's piece
+        } else {
+          break; // Stop if it's the same color piece
+        }
+        newRow += offsetRow;
+        newCol += offsetCol;
+      }
+    }
+
+    return possibleQueenMoves;
+  };
 
   const handleTileClick = () => {
     const piece = piecePositions[rowIndex][colIndex];
     if (piece !== "" && !selectedPiece) {
       const player = piece === piece.toUpperCase() ? "Black" : "White"; // TODO: to check if it is that players turn
-      calculateKnightMoves(rowIndex, colIndex); 
-      // TODO: lift state of calculated moves up to chessboard component
-      // to highlight tiles
+      if (piece.toUpperCase() === "N") {
+        console.log("knight");
+        updatePossibleMoves(calculateKnightMoves(rowIndex, colIndex));
+      } else if (piece.toUpperCase() === "Q") {
+        console.log("queen");
+        updatePossibleMoves(calculateQueenMoves(rowIndex, colIndex));
+
+      }
       updateSelectedPiece({ player, piece, rowIndex, colIndex });
       
     } else if (selectedPiece) {
       console.log("selectedPiece: ", selectedPiece);
-      console.log("moved to: -> ", rowIndex, colIndex);
-
-      // calculate possible moves for that piece
-
-      const updatedPiecePositions = [...piecePositions];
-      updatedPiecePositions[rowIndex][colIndex] = selectedPiece.piece;
-      const prevRowIndex = selectedPiece.rowIndex;
-      const prevColIndex = selectedPiece.colIndex;
-      updatedPiecePositions[prevRowIndex][prevColIndex] = "";
-      updatePiecePositions(updatedPiecePositions);
-      updateSelectedPiece(null);
+      // check if clicked tile is a possible move
+      const isContained = possibleMoves.some(arr => JSON.stringify(arr) === JSON.stringify([rowIndex, colIndex]));
+      console.log(possibleMoves);
+      if (isContained) {
+        console.log("moved to: -> ", rowIndex, colIndex);
+        const updatedPiecePositions = [...piecePositions];
+        updatedPiecePositions[rowIndex][colIndex] = selectedPiece.piece;
+        const prevRowIndex = selectedPiece.rowIndex;
+        const prevColIndex = selectedPiece.colIndex;
+        updatedPiecePositions[prevRowIndex][prevColIndex] = "";
+        updatePiecePositions(updatedPiecePositions);
+        updateSelectedPiece(null);
+        updatePossibleMoves([]); // set possible moves back to noting
+      } else if(piece === selectedPiece.piece) { 
+        updateSelectedPiece(null); // unselect piece; if piece was selected twice 
+        updatePossibleMoves([]); // set possible moves back to noting
+      }
+      else {
+        console.log("move not allowed");
+      }
     }
   };
 
@@ -104,6 +151,7 @@ export default function Tile({
           ? "bg-red-500"
           : ""
       }
+      ${isPossibleMove ? "bg-yellow-300" : ""}
       grid place-content-center`}
       onClick={() => {
         handleTileClick();
