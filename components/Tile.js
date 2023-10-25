@@ -1,17 +1,20 @@
 "use client";
 import { useState, useEffect } from "react";
+import useMyStore from "@/app/(store)/store";
 
-export default function Tile({
-  rowIndex,
-  colIndex,
-  updatePiecePositions,
-  piecePositions,
-  updateSelectedPiece,
-  selectedPiece,
-  isPossibleMove,
-  possibleMoves,
-  updatePossibleMoves
-}) {
+export default function Tile({ rowIndex, colIndex, isPossibleMove }) {
+  const {
+    selectedPiece,
+    possibleMoves,
+    piecePositions,
+    updateSelectedPiece,
+    updatePossibleMoves,
+    updatePiecePositions,
+    currentPlayer,
+    updatePlayer,
+    boardFlipped
+  } = useMyStore();
+
   const [pieceImage, setPieceImage] = useState("");
 
   useEffect(() => {
@@ -37,7 +40,7 @@ export default function Tile({
 
   function calculateKnightMoves(row, col) {
     const possibleKnightMoves = [];
-    const moveOffsets = [
+    const moveOffsetsKnight = [
       [-2, 1],
       [-1, 2],
       [1, 2],
@@ -47,20 +50,13 @@ export default function Tile({
       [-1, -2],
       [-2, -1],
     ];
-    for (const [offsetRow, offsetCol] of moveOffsets) {
+    for (const [offsetRow, offsetCol] of moveOffsetsKnight) {
       const newRow = row + offsetRow;
       const newCol = col + offsetCol;
 
       if (newRow >= 0 && newRow < 8 && newCol >= 0 && newCol < 8) {
-        // check if destination empty / contains an opponent's piece
         const destinationPiece = piecePositions[newRow][newCol];
-        if (
-          destinationPiece === "" ||
-          (destinationPiece !== "" &&
-            destinationPiece.toUpperCase() !==
-              piecePositions[row][col].toUpperCase())
-              // TODO: change this to also check for lowercase
-        ) {
+        if (destinationPiece === "") {
           possibleKnightMoves.push([newRow, newCol]);
         }
       }
@@ -71,26 +67,28 @@ export default function Tile({
   function calculateQueenMoves(row, col) {
     const possibleQueenMoves = [];
 
-    // Define move directions (horizontal, vertical, and diagonal)
-    const moveDirections = [
-      [-1, 0], [1, 0], [0, -1], [0, 1], // Vertical and horizontal
-      [-1, -1], [-1, 1], [1, -1], [1, 1], // Diagonal
+    const moveOffsetsQueen = [
+      [-1, 0],
+      [1, 0],
+      [0, -1],
+      [0, 1],
+      [-1, -1],
+      [-1, 1],
+      [1, -1],
+      [1, 1],
     ];
 
-    for (const [offsetRow, offsetCol] of moveDirections) {
+    for (const [offsetRow, offsetCol] of moveOffsetsQueen) {
       let newRow = row + offsetRow;
       let newCol = col + offsetCol;
 
       while (newRow >= 0 && newRow < 8 && newCol >= 0 && newCol < 8) {
-        // Check if the destination is empty or contains an opponent's piece
+        // Check if the destination is empty or contains opponent piece
         const destinationPiece = piecePositions[newRow][newCol];
         if (destinationPiece === "") {
           possibleQueenMoves.push([newRow, newCol]);
-        } else if (destinationPiece.toUpperCase() !== piecePositions[row][col].toUpperCase()) {
-          possibleQueenMoves.push([newRow, newCol]);
-          break; // Stop if it's an opponent's piece
         } else {
-          break; // Stop if it's the same color piece
+          break;
         }
         newRow += offsetRow;
         newCol += offsetCol;
@@ -98,26 +96,35 @@ export default function Tile({
     }
 
     return possibleQueenMoves;
-  };
+  }
 
   const handleTileClick = () => {
+    // disable clicking when board is flipped
+    if (boardFlipped) {
+      console.log("Board is flipped, no moves allowed at the moment");
+      return;
+    }
     const piece = piecePositions[rowIndex][colIndex];
     if (piece !== "" && !selectedPiece) {
       const player = piece === piece.toUpperCase() ? "Black" : "White"; // TODO: to check if it is that players turn
-      if (piece.toUpperCase() === "N") {
-        console.log("knight");
-        updatePossibleMoves(calculateKnightMoves(rowIndex, colIndex));
-      } else if (piece.toUpperCase() === "Q") {
-        console.log("queen");
-        updatePossibleMoves(calculateQueenMoves(rowIndex, colIndex));
 
+      if (player !== currentPlayer) {
+        console.log("Not your turn");
+        return;
       }
+
+      const newPossibleMoves =
+        piece.toUpperCase() === "N"
+          ? calculateKnightMoves(rowIndex, colIndex)
+          : calculateQueenMoves(rowIndex, colIndex);
+
+      updatePossibleMoves(newPossibleMoves);
       updateSelectedPiece({ player, piece, rowIndex, colIndex });
-      
     } else if (selectedPiece) {
-      console.log("selectedPiece: ", selectedPiece);
       // check if clicked tile is a possible move
-      const isContained = possibleMoves.some(arr => JSON.stringify(arr) === JSON.stringify([rowIndex, colIndex]));
+      const isContained = possibleMoves.some(
+        (arr) => JSON.stringify(arr) === JSON.stringify([rowIndex, colIndex])
+      );
       console.log(possibleMoves);
       if (isContained) {
         console.log("moved to: -> ", rowIndex, colIndex);
@@ -129,15 +136,23 @@ export default function Tile({
         updatePiecePositions(updatedPiecePositions);
         updateSelectedPiece(null);
         updatePossibleMoves([]); // set possible moves back to noting
-      } else if(piece === selectedPiece.piece) { 
-        updateSelectedPiece(null); // unselect piece; if piece was selected twice 
+        updatePlayer(); // change player
+      } else if (piece === selectedPiece.piece) {
+        updateSelectedPiece(null); // unselect piece; if piece was selected twice
         updatePossibleMoves([]); // set possible moves back to noting
-      }
-      else {
+      } else {
         console.log("move not allowed");
       }
     }
   };
+
+  function Marker() {
+    return (
+      <div className="absolute p-1">
+        <div className="rounded-full p-2 bg-yellow-400 bg-opacity-50"></div>
+      </div>
+    );
+  }
 
   return (
     <div
@@ -148,10 +163,9 @@ export default function Tile({
         selectedPiece &&
         selectedPiece.rowIndex === rowIndex &&
         selectedPiece.colIndex === colIndex
-          ? "bg-red-500"
+          ? "bg-red-400"
           : ""
       }
-      ${isPossibleMove ? "bg-yellow-300" : ""}
       grid place-content-center`}
       onClick={() => {
         handleTileClick();
@@ -160,6 +174,7 @@ export default function Tile({
       {pieceImage && (
         <img src={pieceImage} className="h-12 w-12" alt="piece_image"></img>
       )}
+      {isPossibleMove && <Marker />}
     </div>
   );
 }
