@@ -1,36 +1,67 @@
-This is a [Next.js](https://nextjs.org/) project bootstrapped with [`create-next-app`](https://github.com/vercel/next.js/tree/canary/packages/create-next-app).
+# React Chess - A simplified version of Chess 
+
+## Description
+
+My task was to build a simplified chess game using React. The goal of that challenge was to showcase my understanding of React, my problem-solving skills, my ability to plan and structure an application, and my capacity to write clean, and maintainable code.
+
+## Approaches - Please also include a short description and explanation of the main aspects of your chosen approaches.
+
+- The file, "page.js," redners the game's user interface (the gameboard), and includes board flipping.
+- The file, "Chessboard.js," serves as the base for the project, rendering the chessboard grid and highlighting possible piece moves based on the state from the store.
+- For the chessboard I opted for a two-dimensional 8x8 array, which include the pieces (or empty squares) as strings.
+- "Tile.js," serves as a client-side component in the React Chess project and is responsible for rendering individual chessboard tiles. It manages the interactivity of the tiles, including highlighting possible moves based on the game's state and handles moving the chess pieces.
+- The `calculateKnightMoves` function determines where a knight can jump using predefined L-shaped move offsets while ensuring it stays within the bounds of the chessboard.
+- The `calculateQueenMoves` function determines the potential moves for a queen chess piece by iterating through predefined move offsets, allowing it to move in various directions. It continues to explore each direction while ensuring it stays within the bounds of the chessboard, accumulating valid moves as it goes.
+- I used Zustand for state management in my project. (This might have been overkill but I didnt like passing down so many props to the individual Tile components.)
+
+
+## Deployed on Vercel
+This app is deployed on vercel. At this [link](https://react-chess-teal.vercel.app/).
+
+## Tech Stack
+
+- **Next.js (React)** 
+- **TailwindCSS**
+- **JavaScript**
+
+## Layout Evolution
+
+- I started by constructing the chessboard grid and representing each square as an HTML element.
+- Next, I implemented the game logic, allowing players to select and move chess pieces.
+- To manage turns, I designed a system that alternates between white and black players.
+
+## Responsive Design & Layout
+
+- On smaller screens, the layout adjusts to ensure a user-friendly experience.
+- While no animations or complex drag-and-drop functionality were added, simple clicking actions are used for piece selection and movement.
+
+## Design
+
+- The design of the chessboard follows a simple checkerboard pattern with basic HTML elements to represent the squares.
 
 ## Getting Started
 
-First, run the development server:
+To run the React Chess Challenge locally, follow these steps:
 
+1. Clone the repository to your local machine:
 ```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
+git clone https://github.com/malikkotb/react-chess.git
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+2. Navigate to the project directory:
+```bash
+cd react-chess
+```
 
-You can start editing the page by modifying `app/page.js`. The page auto-updates as you edit the file.
+3. Install the required dependencies:
+```bash
+npm install
+```
 
-This project uses [`next/font`](https://nextjs.org/docs/basic-features/font-optimization) to automatically optimize and load Inter, a custom Google Font.
+4. Start the development server:
+```bash
+npm run dev
+```
 
-## Learn More
+The React Chess Challenge will be available locally at http://localhost:3000.
 
-To learn more about Next.js, take a look at the following resources:
-
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
-
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js/) - your feedback and contributions are welcome!
-
-## Deploy on Vercel
-
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
-
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/deployment) for more details.
