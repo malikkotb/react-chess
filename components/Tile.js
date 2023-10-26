@@ -1,6 +1,7 @@
 "use client";
 import { useState, useEffect } from "react";
-import useMyStore from "@/app/(store)/store";
+import useMyStore from "../app/(store)/store";
+import Marker from "./Marker";
 
 export default function Tile({ rowIndex, colIndex, isPossibleMove }) {
   const {
@@ -127,12 +128,9 @@ export default function Tile({ rowIndex, colIndex, isPossibleMove }) {
       );
       console.log(possibleMoves);
       if (isContained) {
-        console.log("moved to: -> ", rowIndex, colIndex);
         const updatedPiecePositions = [...piecePositions];
         updatedPiecePositions[rowIndex][colIndex] = selectedPiece.piece;
-        const prevRowIndex = selectedPiece.rowIndex;
-        const prevColIndex = selectedPiece.colIndex;
-        updatedPiecePositions[prevRowIndex][prevColIndex] = "";
+        updatedPiecePositions[selectedPiece.rowIndex][selectedPiece.colIndex] = ""; // set previous indices to ""
         updatePiecePositions(updatedPiecePositions);
         updateSelectedPiece(null);
         updatePossibleMoves([]); // set possible moves back to noting
@@ -146,24 +144,16 @@ export default function Tile({ rowIndex, colIndex, isPossibleMove }) {
     }
   };
 
-  function Marker() {
-    return (
-      <div className="absolute p-1">
-        <div className="rounded-full p-2 bg-yellow-400 bg-opacity-50"></div>
-      </div>
-    );
-  }
-
   return (
     <div
-      className={`w-[75px] h-[75px] ${
+      className={`w-[48px] h-[48px] sm:w-[75px] sm:h-[75px] ${
         (rowIndex + colIndex) % 2 === 0 ? "bg-[#ebecd0]" : "bg-[#779556]"
       } 
       ${
         selectedPiece &&
         selectedPiece.rowIndex === rowIndex &&
         selectedPiece.colIndex === colIndex
-          ? "bg-red-400"
+          ? "bg-[#72c916]"
           : ""
       }
       grid place-content-center`}
@@ -172,7 +162,7 @@ export default function Tile({ rowIndex, colIndex, isPossibleMove }) {
       }}
     >
       {pieceImage && (
-        <img src={pieceImage} className="h-12 w-12" alt="piece_image"></img>
+        <img src={pieceImage} className="" alt="piece_image"></img>
       )}
       {isPossibleMove && <Marker />}
     </div>
