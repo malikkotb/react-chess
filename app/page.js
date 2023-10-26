@@ -1,6 +1,7 @@
 "use client";
 import Chessboard from "../components/Chessboard";
 import useMyStore from "./(store)/store";
+import EndGame from "../components/EndGame";
 
 export default function Home() {
   const {
@@ -9,6 +10,7 @@ export default function Home() {
     boardFlipped,
     updateBoardFlip,
     updatePiecePositions,
+    gameOver,
   } = useMyStore();
 
   const flipBoard = (board) => {
@@ -24,10 +26,13 @@ export default function Home() {
     updatePiecePositions(flipBoard(piecePositions));
   };
 
+  
+
   return (
-    <main className="bg-[#202020] bg-opacity-90">
+    <main className="bg-[#202020] bg-opacity-80">
       <div className="flex items-center justify-center h-screen">
         <div>
+          {gameOver && <EndGame />}
           <Chessboard />
           <div className="flex flex-col items-center">
             <div className="text-white flex gap-2 text-2xl p-4">

@@ -1,4 +1,3 @@
-"use client"
 import Tile from "./Tile";
 import useMyStore from "@/app/(store)/store";
 

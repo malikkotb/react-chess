@@ -13,7 +13,8 @@ export default function Tile({ rowIndex, colIndex, isPossibleMove }) {
     updatePiecePositions,
     currentPlayer,
     updatePlayer,
-    boardFlipped
+    boardFlipped,
+    gameOver
   } = useMyStore();
 
   const [pieceImage, setPieceImage] = useState("");
@@ -40,6 +41,7 @@ export default function Tile({ rowIndex, colIndex, isPossibleMove }) {
   }, [piecePositions, rowIndex, colIndex]);
 
   function calculateKnightMoves(row, col) {
+
     const possibleKnightMoves = [];
     const moveOffsetsKnight = [
       [-2, 1],
@@ -51,17 +53,26 @@ export default function Tile({ rowIndex, colIndex, isPossibleMove }) {
       [-1, -2],
       [-2, -1],
     ];
+
+    const currentPiece = piecePositions[row][col];
     for (const [offsetRow, offsetCol] of moveOffsetsKnight) {
       const newRow = row + offsetRow;
       const newCol = col + offsetCol;
 
       if (newRow >= 0 && newRow < 8 && newCol >= 0 && newCol < 8) {
         const destinationPiece = piecePositions[newRow][newCol];
+        const destinationCase = destinationPiece === destinationPiece.toUpperCase() ? 'Black' : 'White';
         if (destinationPiece === "") {
           possibleKnightMoves.push([newRow, newCol]);
+        } else if ((destinationPiece !== currentPiece) && (destinationCase !== currentPlayer)) {
+            possibleKnightMoves.push([newRow, newCol]);
         }
       }
     }
+
+    // TODO: check on queen
+    // if there is a queen in possibleKnightMoves -> check
+
     return possibleKnightMoves;
   }
 
@@ -79,6 +90,8 @@ export default function Tile({ rowIndex, colIndex, isPossibleMove }) {
       [1, 1],
     ];
 
+    const currentPiece = piecePositions[row][col];
+
     for (const [offsetRow, offsetCol] of moveOffsetsQueen) {
       let newRow = row + offsetRow;
       let newCol = col + offsetCol;
@@ -86,11 +99,15 @@ export default function Tile({ rowIndex, colIndex, isPossibleMove }) {
       while (newRow >= 0 && newRow < 8 && newCol >= 0 && newCol < 8) {
         // Check if the destination is empty or contains opponent piece
         const destinationPiece = piecePositions[newRow][newCol];
+        const destinationCase = destinationPiece === destinationPiece.toUpperCase() ? 'Black' : 'White';
         if (destinationPiece === "") {
           possibleQueenMoves.push([newRow, newCol]);
-        } else {
-          break;
-        }
+        } else if ((destinationPiece !== currentPiece) && (destinationCase !== currentPlayer)) {
+            possibleQueenMoves.push([newRow, newCol]);
+            break;
+          } else {
+            break;
+          }
         newRow += offsetRow;
         newCol += offsetCol;
       }
@@ -107,7 +124,7 @@ export default function Tile({ rowIndex, colIndex, isPossibleMove }) {
     }
     const piece = piecePositions[rowIndex][colIndex];
     if (piece !== "" && !selectedPiece) {
-      const player = piece === piece.toUpperCase() ? "Black" : "White"; // TODO: to check if it is that players turn
+      const player = piece === piece.toUpperCase() ? "Black" : "White";
 
       if (player !== currentPlayer) {
         console.log("Not your turn");
@@ -128,9 +145,15 @@ export default function Tile({ rowIndex, colIndex, isPossibleMove }) {
       );
       console.log(possibleMoves);
       if (isContained) {
+        // TODO: if queen was removed -> render END GAME SCENARIO
+        // where you render the winner; the winner is the currentPlayer
+        // if (queen was removed)
+        // updaeGameOver();
+
         const updatedPiecePositions = [...piecePositions];
         updatedPiecePositions[rowIndex][colIndex] = selectedPiece.piece;
-        updatedPiecePositions[selectedPiece.rowIndex][selectedPiece.colIndex] = ""; // set previous indices to ""
+        updatedPiecePositions[selectedPiece.rowIndex][selectedPiece.colIndex] =
+          ""; // set previous indices to ""
         updatePiecePositions(updatedPiecePositions);
         updateSelectedPiece(null);
         updatePossibleMoves([]); // set possible moves back to noting
@@ -153,7 +176,7 @@ export default function Tile({ rowIndex, colIndex, isPossibleMove }) {
         selectedPiece &&
         selectedPiece.rowIndex === rowIndex &&
         selectedPiece.colIndex === colIndex
-          ? "bg-[#72c916]"
+          ? "bg-red-400"
           : ""
       }
       grid place-content-center`}

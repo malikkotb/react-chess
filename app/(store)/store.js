@@ -15,6 +15,7 @@ const useMyStore = create((set) => ({
     ["q", "", "", "", "", "", "", "n"],
     ["", "", "", "", "", "", "", ""],
   ],
+  gameOver: false,
   updateBoardFlip: () =>
     set((state) => ({ boardFlipped: !state.boardFlipped })),
   //   updateBoardFlip: (newBoardFlippedState) =>
@@ -23,7 +24,7 @@ const useMyStore = create((set) => ({
     set((state) => ({
       currentPlayer: state.currentPlayer === "White" ? "Black" : "White",
     })),
-
+  updaeGameOver: () => set((state) => ({ gameOver: !state.gameOver })),
   updateSelectedPiece: (newSelectedPiece) =>
     set({ selectedPiece: newSelectedPiece }),
   updatePossibleMoves: (newPossibleMoves) =>
