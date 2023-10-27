@@ -1,6 +1,8 @@
 import { create } from "zustand";
 
+// Zustand state management store
 const useMyStore = create((set) => ({
+  // global state variables
   currentPlayer: "White",
   selectedPiece: null,
   possibleMoves: [],
@@ -17,12 +19,11 @@ const useMyStore = create((set) => ({
   ],
   gameOver: false,
   checkOnQueen: false,
-  updateCheckOnQueen: (isCheckOnQueen) => set({ checkOnQueen: isCheckOnQueen }),
 
+  // global state updating functions
+  updateCheckOnQueen: (isCheckOnQueen) => set({ checkOnQueen: isCheckOnQueen }),
   updateBoardFlip: () =>
     set((state) => ({ boardFlipped: !state.boardFlipped })),
-  //   updateBoardFlip: (newBoardFlippedState) =>
-  //     set({ boardFlipped: newBoardFlippedState }),
   updatePlayer: () =>
     set((state) => ({
       currentPlayer: state.currentPlayer === "White" ? "Black" : "White",

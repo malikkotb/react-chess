@@ -104,10 +104,9 @@ export default function Tile({ rowIndex, colIndex, isPossibleMove }) {
       }
     }
 
-    // return possibleKnightMoves;
-
   }
 
+  // calculate possible moves for a knight
   function calculateKnightMoves(row, col) {
     const possibleKnightMoves = [];
     const moveOffsetsKnight = [
@@ -146,6 +145,7 @@ export default function Tile({ rowIndex, colIndex, isPossibleMove }) {
     return possibleKnightMoves;
   }
 
+  // calculate possible moves for a queen
   function calculateQueenMoves(row, col) {
     const possibleQueenMoves = [];
 
@@ -192,6 +192,7 @@ export default function Tile({ rowIndex, colIndex, isPossibleMove }) {
     return possibleQueenMoves;
   }
 
+  // functionality for clicking a tile
   const handleTileClick = () => {
     // disable clicking when board is flipped
     if (boardFlipped) {
@@ -219,7 +220,6 @@ export default function Tile({ rowIndex, colIndex, isPossibleMove }) {
       const isContained = possibleMoves.some(
         (arr) => JSON.stringify(arr) === JSON.stringify([rowIndex, colIndex])
       );
-      // console.log(possibleMoves);
 
       if (isContained) {
         const updatedPiecePositions = [...piecePositions];
@@ -227,12 +227,13 @@ export default function Tile({ rowIndex, colIndex, isPossibleMove }) {
 
         updatedPiecePositions[rowIndex][colIndex] = selectedPiece.piece;
         updatedPiecePositions[selectedPiece.rowIndex][selectedPiece.colIndex] =
-          ""; // set previous indices to ""
+          ""; // set previous indices to empty string, to make the move happen
 
         updatePiecePositions(updatedPiecePositions);
         updateSelectedPiece(null);
         updatePossibleMoves([]); // set possible moves back to noting
 
+        // if a queen was removed -> game is over
         if (removedPiece === "q") {
           console.log("game over");
           updateGameOver();

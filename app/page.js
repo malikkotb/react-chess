@@ -14,6 +14,7 @@ export default function Home() {
     checkOnQueen,
   } = useMyStore();
 
+  // flip the board 
   const flipBoard = (board) => {
     return board
       .slice()
@@ -21,6 +22,7 @@ export default function Home() {
       .map((row) => row.slice().reverse());
   };
 
+  // handle flip board button
   const handleFlip = () => {
     console.log(window.innerWidth);
     updateBoardFlip();
