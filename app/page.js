@@ -11,6 +11,7 @@ export default function Home() {
     updateBoardFlip,
     updatePiecePositions,
     gameOver,
+    checkOnQueen,
   } = useMyStore();
 
   const flipBoard = (board) => {
@@ -26,8 +27,6 @@ export default function Home() {
     updatePiecePositions(flipBoard(piecePositions));
   };
 
-  
-
   return (
     <main className="bg-[#202020] bg-opacity-80">
       <div className="flex items-center justify-center h-screen">
@@ -35,7 +34,7 @@ export default function Home() {
           {gameOver && <EndGame />}
           <Chessboard />
           <div className="flex flex-col items-center">
-            <div className="text-white flex gap-2 text-2xl p-4">
+            <div className="text-white flex gap-2 text-2xl p-4 pb-2">
               <div
                 className={`w-8 h-8 border ${
                   currentPlayer === "Black" ? "bg-black" : "bg-white"
@@ -43,6 +42,7 @@ export default function Home() {
               ></div>
               Turn
             </div>
+            { checkOnQueen && <div className="text-red-500 mb-2">{currentPlayer} queen is in check</div>}
             <button
               onClick={handleFlip}
               className="rounded-xl p-2 bg-white text-black"

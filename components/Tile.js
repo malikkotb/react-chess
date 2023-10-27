@@ -14,7 +14,8 @@ export default function Tile({ rowIndex, colIndex, isPossibleMove }) {
     currentPlayer,
     updatePlayer,
     boardFlipped,
-    gameOver
+    updateGameOver,
+    updateCheckOnQueen
   } = useMyStore();
 
   const [pieceImage, setPieceImage] = useState("");
@@ -40,8 +41,74 @@ export default function Tile({ rowIndex, colIndex, isPossibleMove }) {
     }
   }, [piecePositions, rowIndex, colIndex]);
 
-  function calculateKnightMoves(row, col) {
+  function isQueenInCheck() {
+    updateCheckOnQueen(false);
+    // Find the current position of your Queen (assumed to be uppercase 'Q')
+    let queenPosition;
+    for (let i = 0; i < 8; i++) {
+      for (let j = 0; j < 8; j++) {
+        if (piecePositions[i][j] === "Q" && currentPlayer === "White") { // the currentplayer will not have been updated yet
+          console.log("black queen");
+          queenPosition = { row: i, col: j }; // of Black
+          continue;
+        } else if (piecePositions[i][j] === "q" && currentPlayer === "Black") {
+          console.log("white queen ");
+          queenPosition = { row: i, col: j }; // of White
+          continue;
+        }
+      }
+    }
+    // basically calculateKnightMoves for the position of the queen; to check if it is in danger of being in check by a Knight
+    console.log("queen Position black", queenPosition);
+    const qRow = queenPosition.row;
+    const qCol = queenPosition.col;
+    const possibleKnightMoves = [];
+    const moveOffsetsKnight = [
+      [-2, 1],
+      [-1, 2],
+      [1, 2],
+      [2, 1],
+      [2, -1],
+      [1, -2],
+      [-1, -2],
+      [-2, -1],
+    ];
 
+    const currentPiece = piecePositions[qRow][qCol];
+    for (const [offsetRow, offsetCol] of moveOffsetsKnight) {
+      const newRow = qRow + offsetRow;
+      const newCol = qCol + offsetCol;
+
+      if (newRow >= 0 && newRow < 8 && newCol >= 0 && newCol < 8) {
+        const destinationPiece = piecePositions[newRow][newCol];
+        const destinationCase =
+          destinationPiece === destinationPiece.toUpperCase()
+            ? "White"
+            : "Black"; // don't add same color pieces to possible threats
+        if (destinationPiece === "") {
+          possibleKnightMoves.push([newRow, newCol]);
+        } else if (
+          destinationPiece !== currentPiece 
+          && destinationCase !== currentPlayer
+        ) {
+          possibleKnightMoves.push([newRow, newCol]);
+        }
+      }
+    }
+
+
+    console.log(possibleKnightMoves);
+    for (let i = 0; i < possibleKnightMoves.length; i++) {
+      if (piecePositions[possibleKnightMoves[i][0]][possibleKnightMoves[i][1]].toLowerCase() === "n") { // check on queen from knight
+          updateCheckOnQueen(true);
+      }
+    }
+
+    // return possibleKnightMoves;
+
+  }
+
+  function calculateKnightMoves(row, col) {
     const possibleKnightMoves = [];
     const moveOffsetsKnight = [
       [-2, 1],
@@ -61,17 +128,20 @@ export default function Tile({ rowIndex, colIndex, isPossibleMove }) {
 
       if (newRow >= 0 && newRow < 8 && newCol >= 0 && newCol < 8) {
         const destinationPiece = piecePositions[newRow][newCol];
-        const destinationCase = destinationPiece === destinationPiece.toUpperCase() ? 'Black' : 'White';
+        const destinationCase =
+          destinationPiece === destinationPiece.toUpperCase()
+            ? "Black"
+            : "White";
         if (destinationPiece === "") {
           possibleKnightMoves.push([newRow, newCol]);
-        } else if ((destinationPiece !== currentPiece) && (destinationCase !== currentPlayer)) {
-            possibleKnightMoves.push([newRow, newCol]);
+        } else if (
+          destinationPiece !== currentPiece &&
+          destinationCase !== currentPlayer
+        ) {
+          possibleKnightMoves.push([newRow, newCol]);
         }
       }
     }
-
-    // TODO: check on queen
-    // if there is a queen in possibleKnightMoves -> check
 
     return possibleKnightMoves;
   }
@@ -99,15 +169,21 @@ export default function Tile({ rowIndex, colIndex, isPossibleMove }) {
       while (newRow >= 0 && newRow < 8 && newCol >= 0 && newCol < 8) {
         // Check if the destination is empty or contains opponent piece
         const destinationPiece = piecePositions[newRow][newCol];
-        const destinationCase = destinationPiece === destinationPiece.toUpperCase() ? 'Black' : 'White';
+        const destinationCase =
+          destinationPiece === destinationPiece.toUpperCase()
+            ? "Black"
+            : "White";
         if (destinationPiece === "") {
           possibleQueenMoves.push([newRow, newCol]);
-        } else if ((destinationPiece !== currentPiece) && (destinationCase !== currentPlayer)) {
-            possibleQueenMoves.push([newRow, newCol]);
-            break;
-          } else {
-            break;
-          }
+        } else if (
+          destinationPiece !== currentPiece &&
+          destinationCase !== currentPlayer
+        ) {
+          possibleQueenMoves.push([newRow, newCol]);
+          break;
+        } else {
+          break;
+        }
         newRow += offsetRow;
         newCol += offsetCol;
       }
@@ -143,20 +219,29 @@ export default function Tile({ rowIndex, colIndex, isPossibleMove }) {
       const isContained = possibleMoves.some(
         (arr) => JSON.stringify(arr) === JSON.stringify([rowIndex, colIndex])
       );
-      console.log(possibleMoves);
-      if (isContained) {
-        // TODO: if queen was removed -> render END GAME SCENARIO
-        // where you render the winner; the winner is the currentPlayer
-        // if (queen was removed)
-        // updaeGameOver();
+      // console.log(possibleMoves);
 
+      if (isContained) {
         const updatedPiecePositions = [...piecePositions];
+        const removedPiece = piecePositions[rowIndex][colIndex].toLowerCase();
+
         updatedPiecePositions[rowIndex][colIndex] = selectedPiece.piece;
         updatedPiecePositions[selectedPiece.rowIndex][selectedPiece.colIndex] =
           ""; // set previous indices to ""
+
         updatePiecePositions(updatedPiecePositions);
         updateSelectedPiece(null);
         updatePossibleMoves([]); // set possible moves back to noting
+
+        if (removedPiece === "q") {
+          console.log("game over");
+          updateGameOver();
+          return;
+        }
+
+         // check on queen functionality for other player
+         isQueenInCheck();
+
         updatePlayer(); // change player
       } else if (piece === selectedPiece.piece) {
         updateSelectedPiece(null); // unselect piece; if piece was selected twice
