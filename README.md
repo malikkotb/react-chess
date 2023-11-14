@@ -1,10 +1,17 @@
 # React Chess - A simplified version of Chess 
 
+## Deployed on Vercel
+This app is deployed on vercel. At this [link](https://react-chess-teal.vercel.app/).
+
 ## Description
 
 My task was to build a simplified chess game using React. The goal of that challenge was to showcase my understanding of React, my problem-solving skills, my ability to plan and structure an application, and my capacity to write clean, and maintainable code.
 
-## Approaches - Please also include a short description and explanation of the main aspects of your chosen approaches.
+## Screenshots
+<img width="550" alt="Screenshot 2023-11-14 at 13 34 12" src="https://github.com/malikkotb/react-chess/assets/50169361/9d1c602d-ca47-401f-be7f-17ac9a58d761">
+<img width="550" alt="Screenshot 2023-11-14 at 13 39 05" src="https://github.com/malikkotb/react-chess/assets/50169361/13a83784-fc14-45fe-a02b-e282b66bc4a0">
+
+## Approaches
 
 - The file, "page.js," redners the game's user interface (the gameboard), and includes board flipping.
 - The file, "Chessboard.js," serves as the base for the project, rendering the chessboard grid and highlighting possible piece moves based on the state from the store.
@@ -13,10 +20,7 @@ My task was to build a simplified chess game using React. The goal of that chall
 - The `calculateKnightMoves` function determines where a knight can jump using predefined L-shaped move offsets while ensuring it stays within the bounds of the chessboard.
 - The `calculateQueenMoves` function determines the potential moves for a queen chess piece by iterating through predefined move offsets, allowing it to move in various directions. It continues to explore each direction while ensuring it stays within the bounds of the chessboard, accumulating valid moves as it goes.
 - I used Zustand for state management in my project. (This might have been overkill but I didnt like passing down so many props to the individual Tile components.)
-
-
-## Deployed on Vercel
-This app is deployed on vercel. At this [link](https://react-chess-teal.vercel.app/).
+- Functionality if a queen is in check is also implemented.
 
 ## Tech Stack
 
